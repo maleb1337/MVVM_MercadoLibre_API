@@ -1,12 +1,13 @@
 package cl.maleb.mercadolibre.challenge.ui.search
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
+import cl.maleb.mercadolibre.challenge.api.list.MLResultData
 import cl.maleb.mercadolibre.challenge.data.MLRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,5 +23,16 @@ class SearchViewModel @Inject constructor(
     }
 
     val results = resultsFlow.asLiveData()
+
+    /**
+     * Events section
+     */
+
+    private val searchEventChannel = Channel<SearchEvent>()
+    val searchEvent = searchEventChannel.receiveAsFlow()
+
+    fun onResultSelected(resultData: MLResultData) = viewModelScope.launch {
+        searchEventChannel.send(SearchEvent.NavigateToDetailScreen(resultData))
+    }
 
 }

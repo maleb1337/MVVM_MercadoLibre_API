@@ -6,15 +6,18 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import cl.maleb.mercadolibre.challenge.R
+import cl.maleb.mercadolibre.challenge.api.list.MLResultData
 import cl.maleb.mercadolibre.challenge.databinding.FragmentSearchBinding
 import cl.maleb.mercadolibre.challenge.shared.ResultListAdapter
 import cl.maleb.mercadolibre.challenge.util.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
-class SearchFragment : Fragment(R.layout.fragment_search) {
+class SearchFragment : Fragment(R.layout.fragment_search), ResultListAdapter.OnItemClickListener {
 
     private val viewModel: SearchViewModel by viewModels()
 
@@ -35,7 +38,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
 
-        val resultAdapter = ResultListAdapter()
+        val resultAdapter = ResultListAdapter(this)
 
         binding.apply {
             recyclerView.apply {
@@ -64,6 +67,18 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 }
 
             })
+
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                viewModel.searchEvent.collect { event ->
+                    when (event) {
+                        is SearchEvent.NavigateToDetailScreen -> {
+//                            var transaction = parentFragmentManager.beginTransaction()
+//                            transaction = transaction.attach()
+                        }
+                    }
+                }
+            }
+
         }
         super.onViewCreated(view, savedInstanceState)
     }
@@ -91,5 +106,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             viewModel.searchQuery.value = it
         }
 
+    }
+
+    override fun onItemClick(resultData: MLResultData) {
+        viewModel.onResultSelected(resultData)
     }
 }

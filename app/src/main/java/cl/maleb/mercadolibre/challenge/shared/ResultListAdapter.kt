@@ -6,12 +6,13 @@ import androidx.recyclerview.widget.ListAdapter
 import cl.maleb.mercadolibre.challenge.api.list.MLResultData
 import cl.maleb.mercadolibre.challenge.databinding.ItemResultListBinding
 
-class ResultListAdapter : ListAdapter<MLResultData, ResultViewHolder>(ResultItemComparator()) {
+class ResultListAdapter(private val listener: OnItemClickListener) :
+    ListAdapter<MLResultData, ResultViewHolder>(ResultItemComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultViewHolder {
         val binding =
             ItemResultListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ResultViewHolder(binding)
+        return ResultViewHolder(binding, listener)
     }
 
     override fun onBindViewHolder(holder: ResultViewHolder, position: Int) {
@@ -19,6 +20,10 @@ class ResultListAdapter : ListAdapter<MLResultData, ResultViewHolder>(ResultItem
         if (currentItem != null) {
             holder.bind(currentItem)
         }
+    }
+
+    interface OnItemClickListener {
+        fun onItemClick(resultData: MLResultData)
     }
 
 
