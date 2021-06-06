@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Mercado Libre Challenge</string>
+    <string name="retry">Intentar nuevamente</string>
+    <string name="no_results_found">No se han encontrado resultados.</string>
+    <string name="search_instructions">Haz clic en la lupa para empezar tu búsqueda</string>
+    <string name="no_bookmarks">No hay favoritos guardados</string>
+    <string name="search">Búsqueda</string>
+    <string name="bookmarks">Guardados</string>
+    <string name="title_search_fragment">Buscar</string>
+    <string name="title_bookmarks_fragment">Mi lista</string>
 </resources>
