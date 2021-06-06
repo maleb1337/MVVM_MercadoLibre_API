@@ -8,6 +8,5 @@ data class Attribute(
     val source: Long? = null,
     val value_id: String? = null,
     val value_name: String? = null,
-    val value_struct: String? = null,
     val values: List<AttributeValue>? = null
 )

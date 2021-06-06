@@ -1,5 +1,9 @@
 package cl.maleb.mercadolibre.challenge.api.list
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "resultDataTable")
 data class MLResultData(
     val accepts_mercadopago: Boolean? = null,
     val address: Address? = null,
@@ -12,14 +16,14 @@ data class MLResultData(
     val currency_id: String? = null,
     val differential_pricing: DifferentialPricing? = null,
     val domain_id: String? = null,
-    val id: String? = null,
+    @PrimaryKey val id: String,
     val installments: Installments? = null,
     val listing_type_id: String? = null,
     val official_store_id: Int? = null,
     val order_backend: Int? = null,
     val original_price: String? = null,
     val permalink: String? = null,
-    val price: Int? = null,
+    val price: Double? = null,
     val prices: Prices? = null,
     val sale_price: String? = null,
     val seller: Seller? = null,

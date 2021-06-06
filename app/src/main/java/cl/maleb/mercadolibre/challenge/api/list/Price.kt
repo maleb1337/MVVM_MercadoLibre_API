@@ -1,7 +1,7 @@
 package cl.maleb.mercadolibre.challenge.api.list
 
 data class Price(
-    val amount: Int? = null,
+    val amount: Double? = null,
     val conditions: Conditions? = null,
     val currency_id: String? = null,
     val exchange_rate_context: String? = null,
