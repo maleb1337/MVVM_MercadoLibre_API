@@ -10,7 +10,9 @@ import cl.maleb.mercadolibre.challenge.ui.search.SearchFragment
 import cl.maleb.mercadolibre.challenge.util.KEY_SELECTED_INDEX
 import cl.maleb.mercadolibre.challenge.util.TAG_BOOKMARKS_FRAGMENT
 import cl.maleb.mercadolibre.challenge.util.TAG_SEARCH_FRAGMENT
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
