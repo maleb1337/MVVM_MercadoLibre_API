@@ -1,5 +1,6 @@
 package cl.maleb.mercadolibre.challenge.ui.search
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
@@ -12,6 +13,7 @@ import cl.maleb.mercadolibre.challenge.R
 import cl.maleb.mercadolibre.challenge.api.list.MLResultData
 import cl.maleb.mercadolibre.challenge.databinding.FragmentSearchBinding
 import cl.maleb.mercadolibre.challenge.shared.ResultListAdapter
+import cl.maleb.mercadolibre.challenge.ui.detail.DetailActivity
 import cl.maleb.mercadolibre.challenge.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -49,9 +51,11 @@ class SearchFragment : Fragment(R.layout.fragment_search), ResultListAdapter.OnI
             viewModel.results.observe(viewLifecycleOwner, { result ->
                 when (result) {
                     is Resource.Error -> {
-                        textViewError.visible()
-                        textViewError.isVisible = result.data.isNullOrEmpty()
-                        textViewError.text = result.error?.localizedMessage
+                        textViewError.apply {
+                            isVisible = result.data.isNullOrEmpty()
+                            text = result.error?.localizedMessage
+                        }
+
                     }
                     is Resource.Loading -> {
                     }
@@ -72,8 +76,11 @@ class SearchFragment : Fragment(R.layout.fragment_search), ResultListAdapter.OnI
                 viewModel.searchEvent.collect { event ->
                     when (event) {
                         is SearchEvent.NavigateToDetailScreen -> {
-//                            var transaction = parentFragmentManager.beginTransaction()
-//                            transaction = transaction.attach()
+                            activity?.let {
+                                val intent = Intent(activity, DetailActivity::class.java)
+                                intent.putExtra(ARG_NAME_IDENTIFIER, event.resultData.id)
+                                it.startActivity(intent)
+                            }
                         }
                     }
                 }

@@ -10,6 +10,7 @@ class MLRepository @Inject constructor(
     private val appDatabase: AppDatabase
 ) {
     private val resultDao = appDatabase.resultDao()
+    private val detailDao = appDatabase.detailDao()
 
     fun getListBySearch(searchQuery: String) = networkBoundResource(
         databaseQuery = {
@@ -25,6 +26,22 @@ class MLRepository @Inject constructor(
             }
         }
 
+    )
+
+    fun getDetailById(identifier: String) = networkBoundResource(
+        databaseQuery = {
+            detailDao.getDetail(identifier)
+        },
+        networkCall = {
+            mlApiService.getDetailById(identifier)
+        },
+        saveCallResult = { detailDataItem ->
+            appDatabase.withTransaction {
+                detailDao.deleteDetail()
+                detailDataItem.first().body?.let { body -> detailDao.insertDetail(body) }
+            }
+
+        }
     )
 
 }

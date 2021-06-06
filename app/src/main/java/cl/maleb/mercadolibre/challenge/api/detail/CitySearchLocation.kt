@@ -1,6 +1,6 @@
 package cl.maleb.mercadolibre.challenge.api.detail
 
 data class CitySearchLocation(
-    val id: String,
-    val name: String
+    val id: String? = null,
+    val name: String? = null
 )
