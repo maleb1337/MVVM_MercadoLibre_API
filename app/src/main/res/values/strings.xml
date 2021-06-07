@@ -10,5 +10,6 @@
     <string name="title_bookmarks_fragment">Mi lista</string>
     <string name="empty_content_description" />
     <string name="search_action">Buscar</string>
-    <string name="price_formatted">$ %s</string>
+    <string name="price_formatted">$ %s %s</string>
+    <string name="detail_activity">Detalles</string>
 </resources>

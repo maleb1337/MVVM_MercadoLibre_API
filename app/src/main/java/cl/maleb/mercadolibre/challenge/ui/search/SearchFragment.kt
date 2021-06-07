@@ -24,6 +24,7 @@ class SearchFragment : Fragment(R.layout.fragment_search), ResultListAdapter.OnI
     private val viewModel: SearchViewModel by viewModels()
 
     private lateinit var searchView: SearchView
+    private lateinit var resultAdapter: ResultListAdapter
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
@@ -38,56 +39,44 @@ class SearchFragment : Fragment(R.layout.fragment_search), ResultListAdapter.OnI
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setHasOptionsMenu(true)
+        setUpView()
+        initObservers()
+        super.onViewCreated(view, savedInstanceState)
+    }
 
-        val resultAdapter = ResultListAdapter(this)
-
-        binding.apply {
-            recyclerView.apply {
-                adapter = resultAdapter
-                layoutManager = LinearLayoutManager(context)
+    private fun initObservers() {
+        viewModel.resultListLiveData.observe(viewLifecycleOwner, { result ->
+            when (result) {
+                is Resource.Error -> {
+                    showErrorView(result.data, result.error)
+                }
+                is Resource.Loading -> {
+                    showLoadingView()
+                }
+                is Resource.Success -> {
+                    showSuccessView(result.data)
+                }
             }
 
-            viewModel.results.observe(viewLifecycleOwner, { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        textViewError.apply {
-                            isVisible = result.data.isNullOrEmpty()
-                            text = result.error?.localizedMessage
-                        }
+        })
 
-                    }
-                    is Resource.Loading -> {
-                    }
-                    is Resource.Success -> {
-                        requireActivity().hideSoftKeyboard()
-                        if (result.data!!.isNotEmpty()) {
-                            resultAdapter.submitList(result.data)
-                            textViewInstructions.gone()
-                        } else {
-                            view.snack(message = getString(R.string.no_results_found)) { }
-                        }
-                    }
-                }
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.searchEvent.collect { event ->
+                when (event) {
+                    is SearchEvent.NavigateToDetailScreen -> {
+                        activity?.hideSoftKeyboard()
+                        searchView.clearFocus()
 
-            })
-
-            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                viewModel.searchEvent.collect { event ->
-                    when (event) {
-                        is SearchEvent.NavigateToDetailScreen -> {
-                            activity?.let {
-                                val intent = Intent(activity, DetailActivity::class.java)
-                                intent.putExtra(ARG_NAME_IDENTIFIER, event.resultData.id)
-                                it.startActivity(intent)
-                            }
+                        activity?.let {
+                            val intent = Intent(activity, DetailActivity::class.java)
+                            intent.putExtra(ARG_NAME_IDENTIFIER, event.resultData.id)
+                            it.startActivity(intent)
                         }
                     }
                 }
             }
 
         }
-        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onDestroyView() {
@@ -101,16 +90,12 @@ class SearchFragment : Fragment(R.layout.fragment_search), ResultListAdapter.OnI
         val searchItem = menu.findItem(R.id.action_search)
         searchView = searchItem.actionView as SearchView
 
-        // Just to restore searchView when phone is rotated
-        val pendingQuery = viewModel.searchQuery.value
-        if (pendingQuery != null && pendingQuery.isNotEmpty()) {
-            searchItem.expandActionView()
-            searchView.setQuery(pendingQuery, false)
-        }
-
-        searchView.onQueryTextSubmit {
+        searchView.onQueryTextSubmit { query ->
             // update search query
-            viewModel.searchQuery.value = it
+            if (query.isNotEmpty()) {
+                viewModel.getListBySearch(query)
+                viewModel.lastSearchQuery = query
+            }
         }
 
     }
@@ -118,4 +103,59 @@ class SearchFragment : Fragment(R.layout.fragment_search), ResultListAdapter.OnI
     override fun onItemClick(resultData: MLResultData) {
         viewModel.onResultSelected(resultData)
     }
+
+    private fun showLoadingView() {
+        binding.apply {
+            if (swipeRefreshLayout.isRefreshing) {
+                textViewInstructions.gone()
+            } else {
+                textViewInstructions.gone()
+                progressBar.visible()
+            }
+        }
+    }
+
+    private fun showErrorView(data: List<MLResultData>?, error: Throwable?) {
+        binding.apply {
+            progressBar.gone()
+            textViewError.apply {
+                isVisible = data.isNullOrEmpty()
+                text = error?.localizedMessage
+            }
+        }
+    }
+
+    private fun showSuccessView(data: List<MLResultData>?) {
+        binding.apply {
+            progressBar.gone()
+            requireActivity().hideSoftKeyboard()
+            swipeRefreshLayout.isRefreshing = false
+            searchView.clearFocus()
+
+            if (data!!.isNotEmpty()) {
+                resultAdapter.submitList(data)
+            } else {
+                textViewInstructions.visible()
+                view?.snack(message = getString(R.string.no_results_found)) { }
+            }
+        }
+    }
+
+    private fun setUpView() {
+        setHasOptionsMenu(true)
+        resultAdapter = ResultListAdapter(this)
+
+        binding.apply {
+            recyclerView.apply {
+                adapter = resultAdapter
+                layoutManager = LinearLayoutManager(context)
+            }
+
+            swipeRefreshLayout.setOnRefreshListener {
+                viewModel.getListBySearch(viewModel.lastSearchQuery.orEmpty())
+            }
+        }
+    }
+
+
 }

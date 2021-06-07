@@ -1,14 +1,12 @@
 package cl.maleb.mercadolibre.challenge
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import cl.maleb.mercadolibre.challenge.databinding.ActivityMainBinding
-import cl.maleb.mercadolibre.challenge.ui.bookmarks.BookmarksFragment
 import cl.maleb.mercadolibre.challenge.ui.search.SearchFragment
 import cl.maleb.mercadolibre.challenge.util.KEY_SELECTED_INDEX
-import cl.maleb.mercadolibre.challenge.util.TAG_BOOKMARKS_FRAGMENT
 import cl.maleb.mercadolibre.challenge.util.TAG_SEARCH_FRAGMENT
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,10 +15,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private lateinit var searchFragment: SearchFragment
-    private lateinit var bookmarksFragment: BookmarksFragment
 
     private val fragments: Array<Fragment>
-        get() = arrayOf(searchFragment, bookmarksFragment)
+        get() = arrayOf(searchFragment)
 
     private var selectedIndex = 0
 
@@ -40,7 +37,6 @@ class MainActivity : AppCompatActivity() {
 
         title = when (selectedFragment) {
             is SearchFragment -> getString(R.string.title_search_fragment)
-            is BookmarksFragment -> getString(R.string.title_bookmarks_fragment)
             else -> ""
         }
     }
@@ -53,17 +49,13 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             searchFragment = SearchFragment()
-            bookmarksFragment = BookmarksFragment()
 
             supportFragmentManager.beginTransaction()
                 .add(binding.fragmentContainer.id, searchFragment, TAG_SEARCH_FRAGMENT)
-                .add(binding.fragmentContainer.id, bookmarksFragment, TAG_BOOKMARKS_FRAGMENT)
                 .commit()
         } else {
             searchFragment =
                 supportFragmentManager.findFragmentByTag(TAG_SEARCH_FRAGMENT) as SearchFragment
-            bookmarksFragment =
-                supportFragmentManager.findFragmentByTag(TAG_BOOKMARKS_FRAGMENT) as BookmarksFragment
 
             selectedIndex = savedInstanceState.getInt(KEY_SELECTED_INDEX, 0)
         }
@@ -73,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavBar.setOnNavigationItemSelectedListener { item ->
             val fragment = when (item.itemId) {
                 R.id.nav_search -> searchFragment
-                R.id.nav_bookmarks -> bookmarksFragment
                 else -> throw IllegalArgumentException("Unexpected itemId")
             }
 
