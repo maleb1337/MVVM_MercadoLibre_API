@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cl.maleb.mercadolibre.challenge.R
 import cl.maleb.mercadolibre.challenge.api.list.MLResultData
 import cl.maleb.mercadolibre.challenge.databinding.FragmentSearchBinding
-import cl.maleb.mercadolibre.challenge.shared.ResultListAdapter
+import cl.maleb.mercadolibre.challenge.shared.result.ResultListAdapter
 import cl.maleb.mercadolibre.challenge.ui.detail.DetailActivity
 import cl.maleb.mercadolibre.challenge.util.*
 import dagger.hilt.android.AndroidEntryPoint

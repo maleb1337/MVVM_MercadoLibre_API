@@ -1,4 +1,4 @@
-package cl.maleb.mercadolibre.challenge.shared
+package cl.maleb.mercadolibre.challenge.shared.result
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -10,6 +10,7 @@ import cl.maleb.mercadolibre.challenge.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.concurrent.locks.Condition
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +27,14 @@ class DetailViewModel @Inject constructor(
                 detailMutableLiveData.value = it
             }
         }
+
+    fun getConditionValue(condition: String): String {
+        return when (condition) {
+            "new" -> "Nuevo"
+            "used" -> "Usado"
+            else -> condition
+        }
+    }
 
 
 }

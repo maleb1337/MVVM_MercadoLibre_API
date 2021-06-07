@@ -2,6 +2,7 @@ package cl.maleb.mercadolibre.challenge.api.detail
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import cl.maleb.mercadolibre.challenge.util.setNumberMiles
 
 @Entity(tableName = "detailDataTable")
 data class Body(
@@ -47,4 +48,9 @@ data class Body(
     val variations: List<Variation>? = null,
     val video_id: String? = null,
     val warranty: String? = null
-)
+) {
+    val priceFormatted: String
+        get() {
+            return setNumberMiles(price ?: 0)
+        }
+}

@@ -1,4 +1,4 @@
-package cl.maleb.mercadolibre.challenge.shared
+package cl.maleb.mercadolibre.challenge.shared.result
 
 import androidx.recyclerview.widget.DiffUtil
 import cl.maleb.mercadolibre.challenge.api.list.MLResultData
