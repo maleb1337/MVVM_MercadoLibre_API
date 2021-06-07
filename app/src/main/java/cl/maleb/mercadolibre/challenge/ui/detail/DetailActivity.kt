@@ -1,17 +1,16 @@
 package cl.maleb.mercadolibre.challenge.ui.detail
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import cl.maleb.mercadolibre.challenge.R
 import cl.maleb.mercadolibre.challenge.databinding.ActivityDetailBinding
+import cl.maleb.mercadolibre.challenge.shared.attributes.AttributesListAdapter
 import cl.maleb.mercadolibre.challenge.shared.image.ImageListAdapter
-import cl.maleb.mercadolibre.challenge.util.ARG_NAME_IDENTIFIER
-import cl.maleb.mercadolibre.challenge.util.Resource
-import cl.maleb.mercadolibre.challenge.util.gone
-import cl.maleb.mercadolibre.challenge.util.visible
+import cl.maleb.mercadolibre.challenge.util.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,8 +23,12 @@ class DetailActivity : AppCompatActivity() {
         val binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        supportActionBar?.title = ""
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         val identifier: String = intent.getStringExtra(ARG_NAME_IDENTIFIER).toString()
         val imageListAdapter = ImageListAdapter()
+        val attributesListAdapter = AttributesListAdapter()
 
         viewModel.getDetailData(identifier)
 
@@ -44,7 +47,7 @@ class DetailActivity : AppCompatActivity() {
                     }
                     is Resource.Success -> {
                         progressBar.gone()
-                        // set adapter
+                        // set adapters
                         imageRecyclerView.apply {
                             adapter = imageListAdapter
                             layoutManager = LinearLayoutManager(
@@ -53,9 +56,14 @@ class DetailActivity : AppCompatActivity() {
                                 false
                             )
                         }
+                        attributesRecyclerView.apply {
+                            adapter = attributesListAdapter
+                            layoutManager = LinearLayoutManager(this@DetailActivity)
+                        }
                         // set data to controls
                         result.data?.apply {
                             imageListAdapter.submitList(pictures)
+                            attributesListAdapter.submitList(attributes)
 
                             textViewCondition.text =
                                 viewModel.getConditionValue(condition.orEmpty())
@@ -71,4 +79,17 @@ class DetailActivity : AppCompatActivity() {
 
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+            }
+        }
+        return true
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
 }
